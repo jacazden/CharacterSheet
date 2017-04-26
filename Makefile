@@ -1,9 +1,9 @@
 CC = g++
 
-CFLAGS = -Wall -Wextra -std=c++11
+CFLAGS = -Wall -Wextra -lmenu -lpanel -lncurses -lboost_system -lboost_filesystem -std=c++11
 
 TARGET = CharacterSheet
-MAIN = main.cpp
+MAIN = CharacterSheet.cpp
 FILES = inputhandler.cpp player.cpp skill.cpp attribute.cpp scomponent.cpp component.cpp tag.cpp
 
 all: $(TARGET)

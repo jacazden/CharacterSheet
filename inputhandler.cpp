@@ -11,6 +11,14 @@ void InputHandler::Print(int input)
         std::cout<<input<<std::endl;
         return;
 }
+std::string GetInput(std::string input)
+{
+        std::string output;
+        std::cout<<input;
+        std::cin>>output;
+        std::cout<<endl;
+        return output;
+}
 void InputHandler::Loop()
 {
         std::string splashtext = "Welcome to the character sheet utility";
@@ -25,6 +33,8 @@ void InputHandler::Loop()
         std::regex searchcmd("^search$",std::regex::icase);
         std::regex describecmd("^describe$",std::regex::icase);
         std::regex helpcmd("^help$",std::regex::icase);
+        std::regex savecmd("^save$",std::regex::icase);
+        std::regex loadcmd("^load$",std::regex::icase);
         std::smatch rgx, temp;
         std::cout<<splashtext;
         while(true)
@@ -78,6 +88,28 @@ void InputHandler::Loop()
                         {
                                 std::cout<<helptext<<std::endl;
                         }
+                        else if(std::regex_match(rgx[1].str(),temp,savecmd))
+                        {
+                                if(theplayer->Name()!="")
+                                {
+                                        save(theplayer->Name());
+                                }
+                                else
+                                {
+                                        save();
+                                }
+                        }
+                        else if(std::regex_match(rgx[1].str(),temp,loadcmd))
+                        {
+                                if(rgx.size()>=5)
+                                {
+                                        load(rgx[4].str());
+                                }
+                                else
+                                {
+                                        load("");
+                                }
+                        }
                         else//seach functions
                         {
                                 if(!theplayer->describe(rgx[0].str()))
@@ -87,4 +119,109 @@ void InputHandler::Loop()
                 std::cout<<std::endl;
         }
         return;
+}
+void InputHandler::load(std::string input)
+{
+        using boost::filesystem::path;
+        using boost::filesystem::exists;
+        using boost::filesystem::create_directory;
+        while(1)
+        {
+                std::string yesno= GetInput("Would you like to save the current player? [y/n]");
+                std::regex yes("^(yes|ye|y)",std::regex::icase);
+                std::regex no("^(no|n)",std::regex::icase);
+                std::smatch rgx;
+                if(std::regex_match(yesno,rgx,yes))
+                {
+                        while(theplayer->Name()=="")
+                        {
+                                theplayer->Name(GetInput("Please enter a character name: "));
+                        }
+                        save(theplayer->Name());
+                }
+                else if(std::regex_match(yesno,rgx,no) break;
+                else Print("please answer the question properly");
+        }
+        save("",true);
+        path datadir = pwd/"data";
+        if(input=="")
+                input = GetInput("what player would you like to load? (leave blank for catalog reload) ");
+        if(input!="")
+        {
+                path playerdatapath = datadir / input;
+                path playerdatafile = playerdatapath / (input+".ply");
+                if(exists(playerdatafile))
+                {
+                        theplayer->load(playerdatapath);
+                }
+        }
+        if(exists(datadir))
+        {
+                path catalogdir= datadir / "catalog";
+                if(boost::filesystem::exists(catalogdir) && boost::filesystem::is_directory(catalogdir))
+                {
+                        Component* _cmp;
+                        for(directory_entry& de : directory_iterator(catalogdir))
+                        {
+                                if(de.path().filename().extension().string()==".cmp")
+                                {
+                                        _cmp = new Component;
+                                        _cmp.load(de.path());
+                                        Catalog.push_back(_cmp);
+                                }
+                        }
+                        sComponent* _scp;
+                        for(directory_entry& de : directory_iterator(catalogdir))
+                        {
+                                if(de.path().filename().extension().string()==".scp")
+                                {
+                                        _scp = new sComponent;
+                                        _scp.load(de.path());
+                                        Catalog.push_back(_scp);
+                                }
+                        }
+                }
+        }
+}
+int InputHandler::save(std::string input,bool skipplayer)
+{
+        using boost::filesystem::path;
+        using boost::filesystem::exists;
+        using boost::filesystem::create_directory;
+        path datadir = pwd / "data";
+        path playerdatapath;
+        if(!exists(datadir))
+        {
+                if(!create_directory(datadir)) return -1;
+        }
+        if(skipplayer==false && input=="")
+        {
+                input = theplayer->Name(GetInput("Please enter a character name (or press enter to only save the catalog): "));
+        }
+        if(skipplayer==false && input!="")
+        {
+                playerdatapath = datadir;
+                if(!exists(playerdatapath))
+                {
+                        if(!create_directory(playerdatapath)) return -1;
+                }
+                theplayer->save(playerdatapath);
+        }
+        path catalogdir= datadir / "catalog";
+        if(!exists(catalogdir)) { if(!create_directory(catalogdir)) return -1; }
+        for(int i = 0;i<Catalog.size();i++)
+        {
+                switch(Catalog[i]->ID())
+                {
+                        case 1:
+                                (dynamic_cast<Component*>(Catalog[i]))->save(catalogdir);
+                                break;
+                        case 4:
+                                (dynamic_cast<sComponent*>(Catalog[i]))->save(catalogdir);
+                                break;
+                        default:
+                                break;
+                }
+        }
+        return 0;
 }

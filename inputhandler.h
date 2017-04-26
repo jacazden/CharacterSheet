@@ -8,20 +8,53 @@
 class InputHandler
 {
 private:
+        friend class boost::serialization::access;
         Player* theplayer;
         std::string input;
+        boost::filesystem::path pwd;
         std::vector<std::string> history;
+        std::vector<Tag*> Catalog;
 public:
-        InputHandler()
+        InputHandler(boost::filesystem::path directory)
         {
                 theplayer = new Player;
+                theplayer->pwd = directory;
         }
         ~InputHandler()
         {
                 delete theplayer;
+                for(int i=0;i<Catalog.size();i++)
+                {
+                        if(Catalog[i]->allocated==true)
+                        {
+                                switch(Catalog[i]->ID())
+                                {
+                                        case 0:
+                                                delete dynamic_cast<Tag*>(Catalog[i]);
+                                                break;
+                                        case 1:
+                                                delete dynamic_cast<Component*>(Catalog[i]);
+                                                break;
+                                        case 2:
+                                                delete dynamic_cast<Attribute*>(Catalog[i]);
+                                                break;
+                                        case 3:
+                                                delete dynamic_cast<Skill*>(Catalog[i]);
+                                                break;
+                                        case 4:
+                                                delete dynamic_cast<sComponent*>(Catalog[i]);
+                                                break;
+                                        default:
+                                                break;
+                                }
+                        }
+                }
         }
         void Print() { return; }
         void Print(int input);
         void Print(std::string input);
+        std::string GetInput(std::string input);
         void Loop();
+        int load(std::string input);
+        int save(std::string input="",bool skipplayer=false);
 };

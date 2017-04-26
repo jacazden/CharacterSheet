@@ -1,7 +1,6 @@
 #include"inclusions.h"
 #include"component.h"
 #pragma once
-using namespace std;
 
 class Attribute : public Component
 {
@@ -12,7 +11,7 @@ public:
         {
                 proficient = false;
         }
-        Attribute(string n, string d, int v, bool p,vector<string> l):Component(n,d,v,l)
+        Attribute(std::string n, std::string d, int v, bool p,std::vector<std::string> l):Component(n,d,v,l)
         {
                 proficient = p;
         }
@@ -20,4 +19,6 @@ public:
         bool Proficient();
         bool Proficient(bool input);
         int Mod();
+        int save(boost::filesystem::path dir,bool append=false);
+        Attribute* load(boost::filesystem::path filepath,int seek=0);
 };

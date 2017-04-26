@@ -12,7 +12,8 @@ class Player
 {
 private:
         InputHandler* iph;
-        std::vector<Tag*> Catalog;
+        std::vector<Tag*> Inventory;
+        std::vector<Tag*> InternalCatalog;
         bool describehelper(Skill* input, std::regex query);
         bool describehelper(Attribute* input, std::regex query);
         bool describehelper(Component* input, std::regex query);
@@ -62,7 +63,6 @@ protected:
         //background
         //
         //speed -- tied into race
-        //initiative
         //armor class
         //max health
         //current health
@@ -73,6 +73,8 @@ protected:
         //death saves
         //list of features
         //list of proficiencies
+        //
+        //spellbook.
         template <typename T> T random(T min, T max)
         {
                 return std::uniform_int_distribution<T> {min,max}(*rand);
@@ -86,6 +88,7 @@ protected:
                 return std::normal_distribution<T>{mean,stdev}(*rand);
         }
 public:
+        boost::filesystem::path pwd;
         int roll(std::string instring);
         bool describe(std::string input);
         bool search(std::string input);
@@ -110,13 +113,13 @@ public:
         int Attributevalue(std::string input= "", int val= -1);
         //
         int Skillcheck(std::string input="");
+        int initiative();
         //
         //class
         //race
         //background
         //
         //speed -- tied into race
-        //initiative
         //armor class
         //max health
         //current health
@@ -127,7 +130,14 @@ public:
         //death saves
         //list of features
         //list of proficiencies
-        Player();
+        Player();//TODO
         ~Player();
+        void newplayer();//TODO
+        void save(boost::filesystem::path playerdirectory);//TODO
+        void load(boost::filesystem::path playerdirectory);//TODO
+        void saveInventory(boost::filesystem::path playerdirectory);//TODO
+        void loadInventory(boost::filesystem::path playerdirectory);//TODO
+        void saveCatalog(boost::filesystem::path playerdirectory);//TODO
+        void loadCatalog(boost::filesystem::path playerdirectory);//TODO
 };
 

@@ -1,27 +1,28 @@
 #include"inclusions.h"
 #include"tag.h"
 #pragma once
-using namespace std;
 
 class sComponent:public Tag
 {
 protected:
-        string description;
-        string value;
+        std::string description;
+        std::string value;
 public:
         sComponent()
         {
                 description = "";
-                value = string();
+                value = std::string();
         }
-        sComponent(string n, string d, string v,vector<string> l):Tag(n,l)
+        sComponent(std::string n, std::string d, std::string v,std::vector<std::string> l):Tag(n,l)
         {
                 description = d;
                 value = v;
         }
         virtual int ID(){return 4;}
-        string Description();
-        string Description(string input);
-        string Value();
-        string Value(string input);
+        std::string Description();
+        std::string Description(std::string input);
+        std::string Value();
+        std::string Value(std::string input);
+        int save(boost::filesystem::path dir,bool append=false);
+        sComponent* load(boost::filesystem::path filepath,int seek=0);
 };

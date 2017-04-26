@@ -1,12 +1,11 @@
 #include"inclusions.h"
 #include"tag.h"
 #pragma once
-using namespace std;
 
 class Component:public Tag
 {
 protected:
-        string description;
+        std::string description;
         int value;
 public:
         Component()
@@ -14,14 +13,16 @@ public:
                 description = "";
                 value = 0;
         }
-        Component(string n, string d, int v,vector<string> l):Tag(n,l)
+        Component(std::string n, std::string d, int v,std::vector<std::string> l):Tag(n,l)
         {
                 description = d;
                 value = v;
         }
         virtual int ID(){return 1;}
-        string Description();
-        string Description(string input);
+        std::string Description();
+        std::string Description(std::string input);
         int Value();
         int Value(int input);
+        int save(boost::filesystem::path dir,bool append=false);
+        Component* load(boost::filesystem::path filepath,int seek=0);
 };
